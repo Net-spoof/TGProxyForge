@@ -2,7 +2,13 @@
 set -Eeuo pipefail
 umask 077
 
-SCRIPT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+# Resolve this file to its real location. The installed command is normally
+# /usr/local/bin/tgproxy -> /usr/local/lib/tgproxyforge/tgproxy, so using
+# BASH_SOURCE[0] directly would incorrectly look for modules under
+# /usr/local/bin/lib.
+SCRIPT_PATH="$(readlink -f -- "${BASH_SOURCE[0]}")"
+SCRIPT_ROOT="$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd -P)"
+
 for module in common render manage wizard menu; do
   file="$SCRIPT_ROOT/lib/${module}.sh"
   [[ -r $file ]] || { echo "TGProxyForge: missing module: $file" >&2; exit 1; }
