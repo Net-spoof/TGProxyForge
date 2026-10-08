@@ -1,0 +1,16 @@
+name: Bash syntax
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bash syntax check
+        run: |
+          bash -n install.sh
+          bash -n tgproxy
+          for f in lib/*.sh; do bash -n "$f"; done

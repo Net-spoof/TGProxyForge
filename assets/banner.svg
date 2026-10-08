@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.55" stop-color="#0f2741"/>
+      <stop offset="1" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="16" flood-opacity=".35"/></filter>
+  </defs>
+  <rect width="1200" height="420" rx="34" fill="url(#bg)"/>
+  <circle cx="1010" cy="80" r="190" fill="#38bdf8" opacity=".08"/>
+  <circle cx="160" cy="380" r="220" fill="#22c55e" opacity=".06"/>
+  <g transform="translate(92 78)" filter="url(#shadow)">
+    <rect width="220" height="220" rx="54" fill="#0d1b2a" stroke="#38bdf8" stroke-width="4"/>
+    <path d="M45 118 L181 57 L145 174 L103 140 L78 163 L83 128 Z" fill="none" stroke="url(#accent)" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M84 128 L145 87" stroke="#38bdf8" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <text x="360" y="150" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="72" font-weight="800" fill="#f8fafc">TGProxyForge</text>
+  <text x="365" y="208" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="28" fill="#7dd3fc">FakeTLS • WEB Proxy • Sponsor • Manager</text>
+  <rect x="365" y="250" width="590" height="58" rx="29" fill="#0b1728" stroke="#334155"/>
+  <text x="395" y="288" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="25" fill="#86efac">$ bash &lt;(curl -fsSL .../install.sh)</text>
+  <text x="365" y="352" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#94a3b8">Interactive Telegram proxy deployment for Linux</text>
+</svg>
