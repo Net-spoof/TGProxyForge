@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3 — 2026-10-08
+
+- Add a direct `tgproxy uninstall` command as an alternative to menu option 11.
+- Clarify that the current uninstall stops Caddy as well as the proxy services.
+- Preserve upstream binaries/configuration and recovery backups for safe manual cleanup.
+
+
 ## 0.1.2 — 2026-10-08
 
 - Wait up to 180 seconds for Telemt to establish real Telegram Middle Proxy routing during initial sponsored setup.
