@@ -13,16 +13,23 @@ wizard() {
   hr
   install_prereqs
 
-  local first domain ip port email sponsor=0
+  local first domain ip port email sponsor=0 auto_domain=0
   read -r -p "Server public IP or proxy domain: " first
   first=${first,,}
   if is_ipv4 "$first"; then
     ip="$first"
     while true; do
-      read -r -p "Domain pointing to this IP (required for FakeTLS/WEB): " domain
+      read -r -p "Your domain (press Enter for free auto-generated hostname): " domain
       domain=${domain,,}
+      if [[ -z $domain ]]; then
+        auto_domain=1
+        domain="$(auto_proxy_domain "$ip")"
+        log "Auto hostname: $domain -> $ip (via third-party sslip.io DNS)"
+        warn "Automatic DNS depends on sslip.io availability, resolvers, and successful public TLS certificate issuance."
+        break
+      fi
       is_domain "$domain" && break
-      warn "Enter a valid lowercase domain, e.g. proxy.example.com"
+      warn "Enter a valid lowercase domain, e.g. proxy.example.com, or press Enter for auto hostname."
     done
   elif is_domain "$first"; then
     domain="$first"
@@ -35,7 +42,9 @@ wizard() {
 
   local dns_ip
   dns_ip="$(resolve_domain_ip "$domain")"
-  if [[ -z $dns_ip ]]; then
+  if [[ $auto_domain == 1 && $dns_ip != "$ip" ]]; then
+    die "Automatic hostname $domain did not resolve to $ip (got: ${dns_ip:-no DNS result}). Check DNS access or retry with your own domain. No changes have been made to proxy services."
+  elif [[ -z $dns_ip ]]; then
     warn "The domain currently has no IPv4 A record. Create: $domain -> $ip before certificate issuance."
     prompt_yes_no "Continue anyway?" n || exit 1
   elif [[ $dns_ip != "$ip" ]]; then
@@ -53,13 +62,17 @@ wizard() {
     break
   done
 
-  read -r -p "ACME email [admin@$domain]: " email
-  email=${email:-admin@$domain}
+  if [[ $auto_domain == 1 ]]; then
+    read -r -p "Your real email for HTTPS certificate notifications: " email
+  else
+    read -r -p "ACME email [admin@$domain]: " email
+    email=${email:-admin@$domain}
+  fi
   [[ $email =~ ^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]] || die "Invalid email."
 
   if prompt_yes_no "Enable sponsored/promoted channel support?" y; then sponsor=1; fi
 
-  DOMAIN="$domain"; SERVER_IP="$ip"; FAKETLS_PORT="$port"; ACME_EMAIL="$email"
+  DOMAIN="$domain"; SERVER_IP="$ip"; AUTO_DOMAIN="$auto_domain"; FAKETLS_PORT="$port"; ACME_EMAIL="$email"
   BASE_SECRET="$(random_secret)"; SPONSOR_ENABLED=0; ADTAG=''
   RELAY_PORT="$(choose_loopback_port 18080)"
   ADMIN_PORT="$(choose_loopback_port $((RELAY_PORT+1)))"
@@ -72,7 +85,8 @@ wizard() {
   echo
   hr
   echo "Installation plan"
-  echo "Domain         : $DOMAIN"
+  echo "Hostname       : $DOMAIN"
+  echo "Hostname mode  : $([[ $AUTO_DOMAIN == 1 ]] && echo 'auto (sslip.io; external dependency)' || echo 'own domain')"
   echo "Public IPv4    : $SERVER_IP"
   echo "FakeTLS port   : $FAKETLS_PORT"
   echo "WEB HTTPS port : 443"
