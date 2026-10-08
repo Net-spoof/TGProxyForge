@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.4 — 2026-10-08
+
+- Add a no-owned-domain installation path: enter public IPv4, leave domain empty, and use an automatically generated `IP.sslip.io` hostname.
+- Validate third-party DNS resolution before installing services. Public TLS/ACME and compatible WEB clients are still required.
+- Generate FakeTLS links pointing directly to the public IPv4 while using the auto hostname as FakeTLS SNI.
+- Keep automatic hostnames synchronized when editing the server IP in the manager.
+- Add clickable Telegram contact: [@NET_SPOOF](https://t.me/NET_SPOOF) in bilingual documentation.
+
+
 ## 0.1.3 — 2026-10-08
 
 - Add a direct `tgproxy uninstall` command as an alternative to menu option 11.
