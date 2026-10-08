@@ -8,11 +8,15 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.2-0ea5e9">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.4-0ea5e9">
   <img alt="Shell" src="https://img.shields.io/badge/shell-bash-111827">
   <img alt="Ubuntu" src="https://img.shields.io/badge/Ubuntu-22.04%20%7C%2024.04-E95420">
   <img alt="Debian" src="https://img.shields.io/badge/Debian-12-A81D33">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e">
+</p>
+
+<p align="center">
+  <a href="https://t.me/NET_SPOOF"><strong>💬 Telegram | ارتباط مستقیم: @NET_SPOOF</strong></a>
 </p>
 
 ---
@@ -31,6 +35,12 @@
 
 > [!IMPORTANT]
 > WEB Proxy یک قابلیت proof-of-concept است و فقط روی کلاینت‌هایی که این نوع transport را پشتیبانی کنند کار می‌کند. FakeTLS روی کلاینت‌های سازگار MTProxy استفاده می‌شود.
+
+### نصب بدون خرید دامنه
+
+اگر دامنه شخصی ندارید، آدرس **IPv4 سرور** را در نصب‌کننده وارد کنید. در سؤال «Your domain» فقط **Enter** بزنید؛ نرم‌افزار به‌صورت خودکار از سرویس شخص ثالث [sslip.io](https://sslip.io/) یک hostname مانند `176-65-151-99.sslip.io` تولید می‌کند. این hostname برای HTTPS/WEB و FakeTLS SNI استفاده می‌شود، اما **لینک FakeTLS مستقیماً به IP سرور متصل می‌شود**.
+
+**شرایط و محدودیت‌ها:** سرویس DNS خارجی باید hostname را به IP درست resolve کند؛ همچنین صدور گواهی معتبر HTTPS توسط Caddy به دسترسی عمومی TCP 80/443، سرویس ACME و قوانین CA وابسته است. اگر DNS خودکار در مرحله پیش‌نیاز پاسخ ندهد نصب متوقف می‌شود. این روش بدون *مالکیت دامنه* است، نه کاملاً بدون DNS/hostname. عملکرد WEB Proxy در کلاینت‌های معمول تلگرام تضمین نشده است.
 
 ### نصب سریع
 
@@ -219,6 +229,12 @@ TGProxyForge/
 - Persistent management menu for domain/IP, FakeTLS port, sponsor tag, proxy secret, health checks and updates
 - Automatic HTTPS fallback/masking when FakeTLS owns public port 443
 
+### Install without buying a domain
+
+Enter the server's **public IPv4** and press **Enter** at the optional domain prompt. TGProxyForge creates a hostname such as `176-65-151-99.sslip.io` via third-party [sslip.io](https://sslip.io/) DNS. FakeTLS share links connect directly to the server IP, while the generated hostname is used for SNI and the experimental HTTPS WEB proxy.
+
+**Limitations:** DNS must resolve the generated name to the public IP; HTTPS certificate issuance requires reachable TCP 80/443 and the ACME service. If auto-DNS does not resolve correctly, the installer fails early. This is a **no-owned-domain** mode, not an IP-only mode with no hostname or DNS dependencies. WEB proxy also requires a compatible experimental client.
+
 ### Quick install
 
 ```bash
@@ -237,7 +253,7 @@ tgproxy
 - `x86_64`
 - root access
 - a public IPv4 address
-- a DNS hostname pointing to the server
+- a DNS hostname pointing to the server (your own, or auto-generated via sslip.io when installing from a public IPv4)
 - inbound TCP 80/443 (plus a custom FakeTLS port if selected)
 - outbound connectivity to Telegram infrastructure; sponsor mode may require reachable Telegram Middle-End endpoints, commonly on TCP/8888
 
@@ -265,6 +281,12 @@ TGProxyForge orchestrates and configures these upstream components rather than r
 ### Disclaimer
 
 Network filtering, Telegram client support, provider routing and upstream protocol behavior can change. Test the generated proxy links from the networks you actually intend to support. Sponsored channel display is controlled by Telegram and may not appear immediately even after the server side is configured correctly.
+
+---
+
+## Contact / ارتباط
+
+[**Telegram: @NET_SPOOF**](https://t.me/NET_SPOOF) — برای ارتباط مستقیم، روی شناسه کلیک کنید. / Click to open Telegram.
 
 ---
 
