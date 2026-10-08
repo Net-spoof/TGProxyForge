@@ -46,6 +46,14 @@ is_domain() {
   [[ $d =~ ^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$ && $d == *.* ]]
 }
 
+# Third-party DNS provides a routable hostname without requiring the operator
+# to purchase or configure a domain. It remains an external dependency.
+auto_proxy_domain() {
+  local ip=$1
+  is_ipv4 "$ip" || return 1
+  printf '%s.sslip.io\n' "${ip//./-}"
+}
+
 valid_port() {
   [[ ${1:-} =~ ^[0-9]+$ ]] && (( $1 >= 1 && $1 <= 65535 ))
 }
@@ -106,6 +114,7 @@ save_config() {
   cat >"$CONFIG_FILE" <<EOF_CFG
 DOMAIN=$(printf '%q' "$DOMAIN")
 SERVER_IP=$(printf '%q' "$SERVER_IP")
+AUTO_DOMAIN=$(printf '%q' "${AUTO_DOMAIN:-0}")
 FAKETLS_PORT=$(printf '%q' "$FAKETLS_PORT")
 BASE_SECRET=$(printf '%q' "$BASE_SECRET")
 SPONSOR_ENABLED=$(printf '%q' "$SPONSOR_ENABLED")
@@ -121,6 +130,7 @@ load_config() {
   [[ -f $CONFIG_FILE ]] || die "No TGProxyForge installation found. Run: tgproxy install"
   # shellcheck disable=SC1090
   source "$CONFIG_FILE"
+  AUTO_DOMAIN="${AUTO_DOMAIN:-0}"
 }
 
 install_prereqs() {
