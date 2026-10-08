@@ -76,7 +76,9 @@ self_update() {
   ok "TGProxyForge updated from GitHub. Re-run: tgproxy"
 }
 uninstall_menu() {
-  warn "This removes TGProxyForge services/configuration. Backups under $BACKUP_DIR are kept."
+  warn "This stops Telemt, MTProxy, tproxy-server AND Caddy. Shared Caddy websites will go offline."
+  warn "It removes the TGProxyForge manager and its systemd unit/override, but keeps upstream binaries and configs for recovery."
+  warn "Backups under $BACKUP_DIR are kept."
   prompt_yes_no "Continue uninstall?" n || return 0
   systemctl disable --now telemt tproxy-server mtproxy caddy tproxy-firewall refresh-mtproxy-config.timer 2>/dev/null || true
   rm -f "$TELEMT_UNIT" "$MTPROXY_OVERRIDE" /usr/local/bin/tgproxy /usr/local/sbin/tgproxyforge
@@ -106,7 +108,7 @@ menu() {
 8) Health & TCP/8888 diagnostics
 9) Re-apply current configuration
 10) Update TGProxyForge from GitHub
-11) Uninstall / disable stack
+11) Uninstall / disable stack (حذف نصب)
 0) Exit
 EOF_MENU
     hr
@@ -133,6 +135,7 @@ Usage:
   tgproxy health       Run diagnostics
   tgproxy apply        Re-apply saved configuration
   tgproxy update       Update manager from GitHub
+  tgproxy uninstall    Stop/disable the stack and remove TGProxyForge manager
 EOF_USAGE
 }
 
@@ -140,6 +143,7 @@ main() {
   case ${1:-menu} in
     install) wizard;; menu) menu;; status) need_root; show_status;; links) need_root; show_links;;
     health) need_root; health_check;; apply) need_root; apply_config;; update) need_root; self_update;;
+    uninstall) need_root; uninstall_menu;;
     -h|--help|help) usage;; *) usage; exit 2;;
   esac
 }
