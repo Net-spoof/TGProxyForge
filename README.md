@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.1-0ea5e9">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.2-0ea5e9">
   <img alt="Shell" src="https://img.shields.io/badge/shell-bash-111827">
   <img alt="Ubuntu" src="https://img.shields.io/badge/Ubuntu-22.04%20%7C%2024.04-E95420">
   <img alt="Debian" src="https://img.shields.io/badge/Debian-12-A81D33">
