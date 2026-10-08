@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 — 2026-10-08
+
+- Fix Telemt permissions under `umask 077`: the service user can now traverse `/etc/telemt`.
+- Validate Telemt port binding, API and WEB readiness before declaring installation successful.
+- Return non-zero exit status for failed HTTPS, FakeTLS and sponsored Middle Proxy health checks.
+- Re-running the bootstrap installer resumes a partially installed setup without needless re-cloning.
+
+
 ## 0.1.0 — 2026-10-08
 
 - Initial public release.
