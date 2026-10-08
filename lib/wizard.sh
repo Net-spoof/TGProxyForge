@@ -108,16 +108,19 @@ wizard() {
   fi
   systemctl enable --now telemt
   systemctl restart tproxy-server mtproxy caddy telemt
-  sleep 5
+  verify_stack_ready || die "FakeTLS is not ready. See Telemt logs above. Repair using: tgproxy apply"
 
   save_config
-  ok "Base installation completed."
+  ok "Base installation completed and services verified."
   show_links
 
   if [[ $sponsor == 1 ]]; then setup_sponsor_interactive; fi
 
   echo
-  health_check || true
+  if ! health_check; then
+    warn "One or more health checks failed. Check service logs before sharing proxy links."
+    return 1
+  fi
   echo
   ok "Done. Open the manager any time with: tgproxy"
 }
