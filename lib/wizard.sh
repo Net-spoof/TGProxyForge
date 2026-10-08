@@ -114,7 +114,12 @@ wizard() {
   ok "Base installation completed and services verified."
   show_links
 
-  if [[ $sponsor == 1 ]]; then setup_sponsor_interactive; fi
+  if [[ $sponsor == 1 ]]; then
+    setup_sponsor_interactive
+    # Sponsor is routed through Telegram Middle-End nodes. Initializing the
+    # writer pool can take significantly longer than binding the TCP listener.
+    wait_for_sponsor_route || true
+  fi
 
   echo
   if ! health_check; then
