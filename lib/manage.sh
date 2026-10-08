@@ -68,15 +68,50 @@ sponsor_diagnostics() {
 
 health_check() {
   load_config
+  local failures=0 code
   hr
   echo "Health check"
   printf "DNS A          : "; resolve_domain_ip "$DOMAIN" || true; echo
-  printf "HTTPS          : "; curl -ksS -o /dev/null -w '%{http_code}\n' --max-time 10 "https://$DOMAIN/" || echo FAIL
-  printf "WEB healthz    : "; curl -fsS --max-time 3 "http://127.0.0.1:${ADMIN_PORT}/healthz" || echo FAIL; echo
-  printf "WEB readyz     : "; curl -fsS --max-time 3 "http://127.0.0.1:${ADMIN_PORT}/readyz" || echo FAIL; echo
-  printf "Telemt API     : "; curl -fsS --max-time 3 http://127.0.0.1:9091/v1/users >/dev/null && echo OK || echo FAIL
-  printf "Generic :8888  : "; test_tcp 35.180.139.74 8888 4 && echo OPEN || echo BLOCKED/TIMEOUT
+  printf "HTTPS          : "
+  code="$(curl -fsS -o /dev/null -w '%{http_code}' --max-time 12 "https://$DOMAIN/" 2>/dev/null)" || code="FAIL"
+  printf '%s\n' "$code"
+  [[ $code == 200 ]] || failures=$((failures+1))
+
+  printf "WEB healthz    : "
+  if curl -fsS --max-time 3 "http://127.0.0.1:${ADMIN_PORT}/healthz"; then echo
+  else echo FAIL; failures=$((failures+1)); fi
+
+  printf "WEB readyz     : "
+  if curl -fsS --max-time 3 "http://127.0.0.1:${ADMIN_PORT}/readyz"; then echo
+  else echo FAIL; failures=$((failures+1)); fi
+
+  printf "Telemt service : "
+  if systemctl is-active --quiet telemt && telemt_has_listener; then echo "LISTENING :$FAKETLS_PORT"
+  else echo FAIL; failures=$((failures+1)); fi
+
+  printf "Telemt API     : "
+  if curl -fsS --max-time 3 http://127.0.0.1:9091/v1/users >/dev/null 2>&1; then echo OK
+  else echo FAIL; failures=$((failures+1)); fi
+
+  printf "Generic :8888  : "
+  if test_tcp 35.180.139.74 8888 4; then echo OPEN; else echo BLOCKED/TIMEOUT; fi
+
   sponsor_diagnostics
+  if [[ $SPONSOR_ENABLED == 1 ]]; then
+    if curl -fsS --max-time 3 http://127.0.0.1:9091/v1/runtime/gates \
+        2>/dev/null | jq -e '.data.me_runtime_ready == true and .data.route_mode == "middle" and .data.reroute_active == false' >/dev/null; then
+      ok "Sponsor: Telegram Middle Proxy route is active."
+    else
+      warn "Sponsor is configured, but the real Middle Proxy route is not ready; promotion may not appear."
+      failures=$((failures+1))
+    fi
+  fi
+
+  if (( failures > 0 )); then
+    warn "Health check failed ($failures checks). Installation is not fully ready."
+    return 1
+  fi
+  ok "All required health checks passed."
 }
 
 setup_sponsor_interactive() {
