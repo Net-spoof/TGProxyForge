@@ -56,8 +56,10 @@ install_telemt() {
   trap - RETURN
 
   id telemt >/dev/null 2>&1 || useradd --system --user-group --home-dir "$APP_DIR/telemt" --create-home --shell /usr/sbin/nologin telemt
-  mkdir -p /etc/telemt "$APP_DIR/telemt"
-  chown -R telemt:telemt "$APP_DIR/telemt"
+  # tgproxy uses umask 077. Without explicit directory permissions, the
+  # telemt service account cannot traverse /etc/telemt to read its TOML.
+  install -d -o root -g telemt -m 0750 /etc/telemt
+  install -d -o telemt -g telemt -m 0750 "$APP_DIR/telemt"
 
   cat >"$TELEMT_UNIT" <<EOF_UNIT
 [Unit]
@@ -93,7 +95,9 @@ render_telemt() {
     ad_line="ad_tag = \"${ADTAG}\""
   fi
 
-  mkdir -p /etc/telemt
+  # Also repair permissions on already installed machines when 'tgproxy apply'
+  # is used. The group requires directory execute permission to read the file.
+  install -d -o root -g telemt -m 0750 /etc/telemt
   cat >"$TELEMT_CFG" <<EOF_TOML
 [general]
 use_middle_proxy = $use_me
@@ -139,7 +143,7 @@ ignore_time_skew = false
 [access.users]
 main = "$BASE_SECRET"
 EOF_TOML
-  chown root:telemt "$TELEMT_CFG" 2>/dev/null || true
+  chown root:telemt "$TELEMT_CFG"
   chmod 0640 "$TELEMT_CFG"
 }
 
@@ -264,5 +268,36 @@ apply_config() {
   systemctl restart tproxy-server mtproxy
   systemctl start caddy
   systemctl start telemt
-  sleep 3
+  verify_stack_ready
+}
+
+telemt_has_listener() {
+  ss -H -lntp | awk -v p=":$FAKETLS_PORT" '$4 ~ (p "$") && /telemt/ {found=1} END {exit !found}'
+}
+
+verify_stack_ready() {
+  # systemctl start reports success once a process starts. Telemt may exit
+  # immediately afterwards (e.g. inaccessible config directory). Wait for
+  # its real listener and API before declaring the installation successful.
+  local i
+  log "Verifying service readiness, FakeTLS :$FAKETLS_PORT ..."
+  for i in $(seq 1 45); do
+    if systemctl is-active --quiet telemt &&
+       systemctl is-active --quiet caddy &&
+       systemctl is-active --quiet tproxy-server &&
+       systemctl is-active --quiet mtproxy &&
+       telemt_has_listener &&
+       curl -fsS --max-time 2 http://127.0.0.1:9091/v1/users >/dev/null 2>&1 &&
+       curl -fsS --max-time 2 "http://127.0.0.1:${ADMIN_PORT}/readyz" >/dev/null 2>&1; then
+      ok "Telemt listener, API, WEB relay and all services are ready."
+      return 0
+    fi
+    sleep 1
+  done
+  warn "Startup failed: one or more required services are not ready."
+  systemctl --no-pager --full status telemt caddy mtproxy tproxy-server >&2 || true
+  journalctl -u telemt -n 70 --no-pager >&2 || true
+  warn "Current listeners:"
+  ss -lntp >&2 || true
+  return 1
 }
