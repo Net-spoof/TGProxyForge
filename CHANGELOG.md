@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2 — 2026-10-08
+
+- Wait up to 180 seconds for Telemt to establish real Telegram Middle Proxy routing during initial sponsored setup.
+- Avoid treating temporary direct fallback during startup as a permanent sponsor failure.
+- Keep manual health checks strict: the sponsored route must actually be in middle mode to pass.
+
+
 ## 0.1.1 — 2026-10-08
 
 - Fix Telemt permissions under `umask 077`: the service user can now traverse `/etc/telemt`.
