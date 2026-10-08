@@ -1,5 +1,9 @@
 fake_link() {
-  printf 'tg://proxy?server=%s&port=%s&secret=ee%s%s\n' "$DOMAIN" "$FAKETLS_PORT" "$BASE_SECRET" "$(hex_text "$DOMAIN")"
+  # Auto-hostname users connect directly to the server IP; the generated SNI
+  # hostname is still encoded in the ee FakeTLS secret.
+  local host="$DOMAIN"
+  [[ ${AUTO_DOMAIN:-0} == 1 ]] && host="$SERVER_IP"
+  printf 'tg://proxy?server=%s&port=%s&secret=ee%s%s\n' "$host" "$FAKETLS_PORT" "$BASE_SECRET" "$(hex_text "$DOMAIN")"
 }
 
 web_link() {
@@ -28,6 +32,7 @@ show_status() {
   hr
   printf "%b%s %s%b\n" "$C_BOLD" "$APP_NAME" "$APP_VERSION" "$C_RESET"
   printf "Domain          : %s\n" "$DOMAIN"
+  printf "Domain mode     : %s\n" "$([[ ${AUTO_DOMAIN:-0} == 1 ]] && echo 'auto / sslip.io' || echo 'custom')"
   printf "Server IP       : %s\n" "$SERVER_IP"
   printf "FakeTLS port    : %s\n" "$FAKETLS_PORT"
   printf "Sponsor         : %s\n" "$([[ $SPONSOR_ENABLED == 1 ]] && echo enabled || echo disabled)"
