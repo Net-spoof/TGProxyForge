@@ -1,14 +1,33 @@
 edit_domain_ip() {
   load_config
-  local d ip dns_ip
-  read -r -p "New domain [$DOMAIN]: " d; d=${d:-$DOMAIN}; d=${d,,}
-  is_domain "$d" || { warn "Invalid domain."; return 1; }
-  read -r -p "New public IPv4 [$SERVER_IP]: " ip; ip=${ip:-$SERVER_IP}
+  local d ip dns_ip new_domain new_auto="${AUTO_DOMAIN:-0}"
+
+  read -r -p "New domain [$DOMAIN] (type 'auto' for a free hostname): " d
+  d=${d,,}
+  read -r -p "New public IPv4 [$SERVER_IP]: " ip
+  ip=${ip:-$SERVER_IP}
   is_ipv4 "$ip" || { warn "Invalid IPv4."; return 1; }
-  dns_ip="$(resolve_domain_ip "$d")"
+
+  if [[ $d == auto || ( -z $d && ${AUTO_DOMAIN:-0} == 1 ) ]]; then
+    new_domain="$(auto_proxy_domain "$ip")"
+    new_auto=1
+  else
+    new_domain="${d:-$DOMAIN}"
+    is_domain "$new_domain" || { warn "Invalid domain."; return 1; }
+    new_auto=0
+  fi
+
+  dns_ip="$(resolve_domain_ip "$new_domain")"
+  if [[ $new_auto == 1 && $dns_ip != "$ip" ]]; then
+    warn "Automatic hostname $new_domain resolves to '${dns_ip:-nothing}', not $ip. No changes applied."
+    return 1
+  fi
   [[ $dns_ip == "$ip" ]] || warn "DNS currently resolves to '${dns_ip:-nothing}', not $ip."
-  DOMAIN="$d"; SERVER_IP="$ip"
-  save_config; apply_config; ok "Domain/IP updated. Existing FakeTLS links using the old domain are now stale."
+
+  DOMAIN="$new_domain"; SERVER_IP="$ip"; AUTO_DOMAIN="$new_auto"
+  save_config
+  apply_config
+  ok "Domain/IP updated. Re-share the FakeTLS/WEB links if their address or SNI has changed."
 }
 
 edit_port() {
