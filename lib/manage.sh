@@ -66,6 +66,28 @@ sponsor_diagnostics() {
   hr
 }
 
+# During the first boot, Telemt can temporarily use direct fallback while its
+# Telegram Middle-End writer pool initializes. Poll only in the installation
+# wizard, not during ordinary 'tgproxy health' calls.
+wait_for_sponsor_route() {
+  load_config
+  [[ $SPONSOR_ENABLED == 1 ]] || return 0
+
+  local i
+  log "Waiting up to 180 seconds for Telegram Middle Proxy sponsor routing..."
+  for i in $(seq 1 36); do
+    if curl -fsS --max-time 3 http://127.0.0.1:9091/v1/runtime/gates 2>/dev/null |
+       jq -e '.data.me_runtime_ready == true and .data.use_middle_proxy == true and .data.route_mode == "middle" and .data.reroute_active == false' >/dev/null; then
+      ok "Telegram Middle Proxy routing is ready."
+      return 0
+    fi
+    sleep 5
+  done
+
+  warn "Telegram Middle Proxy is not yet ready. The proxy may still work in direct mode, but the sponsored channel may not appear."
+  return 1
+}
+
 health_check() {
   load_config
   local failures=0 code
