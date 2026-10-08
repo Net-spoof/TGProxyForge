@@ -1,5 +1,5 @@
 APP_NAME="TGProxyForge"
-APP_VERSION="0.1.0"
+APP_VERSION="0.1.1"
 REPO="Net-spoof/TGProxyForge"
 APP_DIR="/opt/tgproxyforge"
 SRC_DIR="$APP_DIR/src"
