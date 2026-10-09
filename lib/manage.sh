@@ -93,6 +93,74 @@ wait_for_sponsor_route() {
   return 1
 }
 
+# Verify the actual authenticated WEB bridge, not merely HTTP 200 or /readyz.
+# The one-time bridge capability is derived in memory and never logged.
+web_bridge_test() {
+  need_root
+  load_config
+  DOMAIN="$DOMAIN" BASE_SECRET="$BASE_SECRET" RELAY_PORT="$RELAY_PORT" python3 - <<'PY'
+import base64
+import hashlib
+import hmac
+import os
+import ssl
+import sys
+import urllib.error
+import urllib.request
+
+host = os.environ["DOMAIN"].lower()
+port = os.environ["RELAY_PORT"]
+secret = bytes.fromhex("dd" + os.environ["BASE_SECRET"])
+capability = base64.urlsafe_b64encode(
+    hmac.new(secret, ("tdesktop-web-proxy-bridge-v1\\n" + host).encode(), hashlib.sha256).digest()
+).rstrip(b"=").decode()
+
+# Never print the capability, bridge URL, or secret. A normal HTTP 200 can
+# simply be the public fallback page and is NOT evidence of WEB readiness.
+opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+endpoints = (
+    ("Local relay", f"http://127.0.0.1:{port}/", {"Host": host}),
+    ("Public HTTPS", f"https://{host}/", {}),
+)
+failures = 0
+for label, base_url, headers in endpoints:
+    print(f"{label}: ", end="", flush=True)
+    try:
+        req_headers = dict(headers)
+        req_headers["Accept"] = "text/html"
+        with opener.open(urllib.request.Request(base_url, headers=req_headers), timeout=12) as r:
+            normal_code = r.status
+            normal_body = r.read(256_000)
+        with opener.open(urllib.request.Request(
+            base_url + "?bridge=" + capability, headers=req_headers
+        ), timeout=12) as r:
+            bridge_code = r.status
+            bridge_body = r.read(256_000)
+            csp = r.headers.get("Content-Security-Policy", "")
+            cache = r.headers.get("Cache-Control", "")
+        authenticated = (
+            normal_code == 200 and bridge_code == 200
+            and bool(csp) and "no-store" in cache.lower()
+            and normal_body != bridge_body
+        )
+        if authenticated:
+            print("OK: authenticated WEB bridge returned distinct HTML with CSP and no-store")
+        else:
+            print("FAIL: public site responds, but authenticated bridge is not verified "
+                  f"(home={normal_code}, bridge={bridge_code}, CSP={bool(csp)}, "
+                  f"no-store={'no-store' in cache.lower()}, "
+                  f"distinct={normal_body != bridge_body})")
+            failures += 1
+    except (urllib.error.URLError, OSError, TimeoutError, ValueError) as exc:
+        print(f"FAIL: {type(exc).__name__}: {exc}")
+        failures += 1
+if failures:
+    print("WEB relay bridge test FAILED; ordinary HTTPS/readyz alone does not prove WEB proxy operation.")
+    sys.exit(1)
+print("WEB relay bridge test PASSED. A WEB-capable Telegram client must still be tested separately.")
+PY
+}
+
 health_check() {
   load_config
   local failures=0 code
@@ -122,6 +190,11 @@ health_check() {
 
   printf "Generic :8888  : "
   if test_tcp 35.180.139.74 8888 4; then echo OPEN; else echo BLOCKED/TIMEOUT; fi
+
+  if ! web_bridge_test; then
+    warn "Authenticated WEB proxy bridge check failed."
+    failures=$((failures+1))
+  fi
 
   sponsor_diagnostics
   if [[ $SPONSOR_ENABLED == 1 ]]; then
