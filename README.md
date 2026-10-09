@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/banner.svg" alt="TGProxyForge" width="940">
   <h1>TGProxyForge</h1>
-  <p><strong>Telegram MTProto FakeTLS &amp; Experimental WEB Proxy</strong><br>Interactive installation • Service management • Sponsor support</p>
+  <p><strong>Telegram MTProto FakeTLS &amp; WEB Proxy</strong><br>Automated deployment • Unified management • Sponsor integration</p>
   <p>
     <img alt="Version" src="https://img.shields.io/badge/version-0.1.5-0284c7">
     <img alt="Platform" src="https://img.shields.io/badge/Linux-Ubuntu%20%7C%20Debian-334155">
@@ -20,18 +20,16 @@
 
 <h2 id="persian">🇮🇷 راهنمای فارسی</h2>
 
-<p><strong>TGProxyForge</strong> ابزار خط فرمانی برای نصب و مدیریت دو سرویس پروکسی تلگرام روی سرور لینوکسی است. پروژه از <a href="https://github.com/telemt/telemt">Telemt</a> برای FakeTLS و از <a href="https://github.com/telegramdesktop/tproxy-server">tproxy-server</a> به‌همراه MTProxy رسمی و Caddy برای WEB Proxy آزمایشی استفاده می‌کند.</p>
+<p><strong>TGProxyForge</strong> ابزار خط فرمانی برای نصب و مدیریت دو سرویس پروکسی تلگرام روی سرور لینوکسی است. پروژه از <a href="https://github.com/telemt/telemt">Telemt</a> برای FakeTLS و از <a href="https://github.com/telegramdesktop/tproxy-server">tproxy-server</a> به‌همراه MTProxy رسمی و Caddy برای WEB Proxy استفاده می‌کند.</p>
 
 <h3>✨ قابلیت‌ها</h3>
 <ul>
   <li>راه‌اندازی <strong>MTProto FakeTLS</strong> و تولید لینک اتصال <code>tg://proxy</code></li>
-  <li>راه‌اندازی <strong>WEB Proxy آزمایشی</strong> و تولید لینک <code>tg://webproxy</code></li>
+  <li>راه‌اندازی <strong>Telegram WEB Proxy</strong> و تولید لینک <code>tg://webproxy</code></li>
   <li>مدیریت دامنه و IP، پورت FakeTLS، Secret و سرویس‌ها از منوی تعاملی</li>
   <li>پشتیبانی از کانال اسپانسری با Proxy Tag صادرشده از <a href="https://t.me/MTProxyBot">@MTProxyBot</a></li>
   <li>نمایش لینک‌ها، بررسی سلامت سرویس‌ها، تست معتبر WEB Bridge، به‌روزرسانی و غیرفعال‌سازی سرویس‌ها</li>
 </ul>
-
-<p><strong>وضعیت WEB Proxy:</strong> این پروتکل هنوز آزمایشی است و تنها با کلاینت تلگرامی که WEB transport را پیاده‌سازی کرده باشد کار می‌کند. سالم‌بودن Bridge یا HTTPS روی سرور، اتصال موفق از اینترنت کاربر را تضمین نمی‌کند.</p>
 
 <h3>🚀 نصب سریع</h3>
 <p>روی سرور ترجیحاً تازه با <strong>Ubuntu 22.04/24.04 یا Debian 12</strong>، معماری <code>x86_64</code>، دسترسی <code>root</code> و IPv4 عمومی اجرا کنید:</p>
@@ -91,6 +89,10 @@
 <p>فرمان <code>tgproxy web-test</code> بررسی می‌کند Bridge روی خود سرور از دو مسیر داخلی و HTTPS پاسخ احرازشده می‌دهد؛ این تست به‌تنهایی اتصال از موبایل، DNS اپراتور یا عملکرد کلاینت را تأیید نمی‌کند.</p>
 <p>برای بررسی خطاها: <a href="docs/TROUBLESHOOTING.fa.md"><strong>راهنمای عیب‌یابی فارسی</strong></a></p>
 
+<h3>📌 سازگاری و محدودیت‌ها</h3>
+<p><strong>WEB Proxy</strong> بر پایه پیاده‌سازی <a href="https://github.com/telegramdesktop/tproxy-server">tproxy-server</a> است که توسعه‌دهنده آن را در مستندات رسمی به‌عنوان <strong>Proof of Concept</strong> معرفی کرده است. استفاده از WEB Proxy به نسخه‌ای از کلاینت تلگرام نیاز دارد که WEB transport را پشتیبانی کند. تست موفق <code>tgproxy web-test</code> فقط عملکرد Bridge از داخل سرور را تأیید می‌کند و به معنی اتصال تضمینی در شبکه یا اپلیکیشن کاربران نیست.</p>
+<p>در حالت نصب بدون دامنه شخصی، hostname رایگان <code>sslip.io</code> برای WEB Proxy به DNS عمومی و دسترسی HTTPS نیاز دارد. بعضی شبکه‌ها ممکن است این hostname یا اتصال به IP سرور را محدود کنند.</p>
+
 <p>📨 ارتباط: <a href="https://t.me/NET_SPOOF"><strong>@NET_SPOOF</strong></a></p>
 
 </div>
@@ -99,17 +101,15 @@
 
 ## 🇬🇧 English guide <a id="english"></a>
 
-**TGProxyForge** is an interactive Bash installer and management CLI for Telegram MTProto FakeTLS and an **experimental WEB Proxy** stack on a Linux server.
+**TGProxyForge** is an interactive Bash installer and management CLI for Telegram MTProto FakeTLS and a **WEB Proxy** stack on a Linux server.
 
 ### Components and features
 
 - **MTProto FakeTLS** powered by [Telemt](https://github.com/telemt/telemt).
-- **Experimental WEB Proxy** powered by [tproxy-server](https://github.com/telegramdesktop/tproxy-server), [official MTProxy](https://github.com/TelegramMessenger/MTProxy) and [Caddy](https://github.com/caddyserver/caddy).
+- **Telegram WEB Proxy** powered by [tproxy-server](https://github.com/telegramdesktop/tproxy-server), [official MTProxy](https://github.com/TelegramMessenger/MTProxy) and [Caddy](https://github.com/caddyserver/caddy).
 - Optional promoted-channel integration through [@MTProxyBot](https://t.me/MTProxyBot).
 - Interactive management of public IP, hostname, FakeTLS port, secrets, proxy links and service lifecycle.
 - Diagnostics for TLS, Telemt, WEB Bridge authentication and Middle Proxy routing.
-
-**Compatibility:** WEB Proxy is a proof-of-concept transport requiring a compatible Telegram client. A successful server-side HTTPS or Bridge test does not guarantee connectivity from an external network.
 
 ### Quick installation
 
@@ -161,5 +161,11 @@ To configure a promoted channel, register the proxy public IP, port and **base s
 ```
 
 For diagnostics, see the [Persian troubleshooting guide](docs/TROUBLESHOOTING.fa.md). For release notes, see [CHANGELOG.md](CHANGELOG.md).
+
+### Compatibility and limitations
+
+The upstream [tproxy-server](https://github.com/telegramdesktop/tproxy-server) documents WEB Proxy as a **proof-of-concept implementation**. WEB transport requires a Telegram client that supports it; compatibility with all Telegram releases is not guaranteed. Passing `tgproxy web-test` verifies the authenticated Bridge from the server, **not** connectivity from a particular device or network.
+
+When using an auto-generated `sslip.io` hostname, WEB Proxy additionally depends on public DNS, certificate issuance and access to the destination IP on the user's network.
 
 **Contact:** [@NET_SPOOF](https://t.me/NET_SPOOF) • **License:** [MIT](LICENSE)
