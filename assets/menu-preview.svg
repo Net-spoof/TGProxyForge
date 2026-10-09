@@ -1,22 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="920" height="720" viewBox="0 0 920 720">
-  <rect width="920" height="720" rx="28" fill="#0b1220"/>
-  <rect x="20" y="20" width="880" height="680" rx="20" fill="#111827" stroke="#334155" stroke-width="2"/>
-  <circle cx="58" cy="55" r="8" fill="#ef4444"/><circle cx="84" cy="55" r="8" fill="#f59e0b"/><circle cx="110" cy="55" r="8" fill="#22c55e"/>
-  <g font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="23">
-    <text x="55" y="110" fill="#38bdf8" font-weight="700">TGProxyForge v0.1.0</text>
-    <text x="55" y="150" fill="#cbd5e1">Domain: proxy.example.com | FakeTLS: 443 | Sponsor: ON</text>
-    <text x="55" y="190" fill="#475569">────────────────────────────────────────────────────</text>
-    <text x="55" y="235" fill="#f8fafc">1) Status</text>
-    <text x="55" y="275" fill="#f8fafc">2) Show proxy links</text>
-    <text x="55" y="315" fill="#f8fafc">3) Edit domain / public IP</text>
-    <text x="55" y="355" fill="#f8fafc">4) Change FakeTLS port</text>
-    <text x="55" y="395" fill="#86efac">5) Sponsor settings</text>
-    <text x="55" y="435" fill="#f8fafc">6) Rotate proxy secret</text>
-    <text x="55" y="475" fill="#f8fafc">7) Restart all services</text>
-    <text x="55" y="515" fill="#f8fafc">8) Health &amp; TCP/8888 diagnostics</text>
-    <text x="55" y="555" fill="#f8fafc">9) Re-apply current configuration</text>
-    <text x="55" y="595" fill="#f8fafc">10) Update TGProxyForge from GitHub</text>
-    <text x="55" y="635" fill="#94a3b8">0) Exit</text>
-    <text x="55" y="675" fill="#38bdf8">Select:</text><rect x="160" y="653" width="13" height="27" fill="#38bdf8"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="870" viewBox="0 0 1060 870">
+  <rect width="1060" height="870" rx="30" fill="#0b1220"/>
+  <rect x="18" y="18" width="1024" height="834" rx="23" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <circle cx="58" cy="57" r="8" fill="#ef4444"/>
+  <circle cx="85" cy="57" r="8" fill="#f59e0b"/>
+  <circle cx="112" cy="57" r="8" fill="#22c55e"/>
+  <g font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="22">
+    <text x="63" y="114" fill="#38bdf8" font-weight="700" font-size="32">TGProxyForge v0.1.5</text>
+    <text x="63" y="161" fill="#cbd5e1" font-size="20">Domain: proxy.example.com  |  FakeTLS: 443  |  Sponsor: ON</text>
+    <line x1="63" y1="187" x2="990" y2="187" stroke="#334155" stroke-width="2"/>
+    <text x="63" y="226" fill="#f1f5f9">1) Status</text>
+    <text x="63" y="269" fill="#f1f5f9">2) Show proxy links</text>
+    <text x="63" y="312" fill="#f1f5f9">3) Edit domain / public IP</text>
+    <text x="63" y="355" fill="#f1f5f9">4) Change FakeTLS port</text>
+    <text x="63" y="398" fill="#86efac">5) Sponsor settings</text>
+    <text x="63" y="441" fill="#f1f5f9">6) Rotate proxy secret</text>
+    <text x="63" y="484" fill="#f1f5f9">7) Restart all services</text>
+    <text x="63" y="527" fill="#f1f5f9">8) Health &amp; TCP/8888 diagnostics</text>
+    <text x="63" y="570" fill="#f1f5f9">9) Re-apply current configuration</text>
+    <text x="63" y="613" fill="#f1f5f9">10) Update TGProxyForge from GitHub</text>
+    <text x="63" y="656" fill="#fbbf24">11) Uninstall / disable stack</text>
+    <text x="63" y="699" fill="#7dd3fc">12) Test WEB bridge authentication / HTTPS</text>
+    <text x="63" y="742" fill="#94a3b8">0) Exit</text>
+    <line x1="63" y1="790" x2="990" y2="790" stroke="#334155" stroke-width="2"/>
+    <text x="63" y="828" fill="#38bdf8" font-size="23">Select:</text>
+    <rect x="167" y="803" width="13" height="28" fill="#38bdf8"/>
   </g>
 </svg>
