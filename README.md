@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.4-0ea5e9">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.5-0ea5e9">
   <img alt="Shell" src="https://img.shields.io/badge/shell-bash-111827">
   <img alt="Ubuntu" src="https://img.shields.io/badge/Ubuntu-22.04%20%7C%2024.04-E95420">
   <img alt="Debian" src="https://img.shields.io/badge/Debian-12-A81D33">
@@ -35,6 +35,16 @@
 
 > [!IMPORTANT]
 > WEB Proxy یک قابلیت proof-of-concept است و فقط روی کلاینت‌هایی که این نوع transport را پشتیبانی کنند کار می‌کند. FakeTLS روی کلاینت‌های سازگار MTProxy استفاده می‌شود.
+
+### بررسی واقعی WEB Proxy
+
+صرف دریافت `HTTPS 200` یا پاسخ `readyz` به معنی قابل استفاده بودن WEB Proxy نیست. پس از نصب، برای آزمایش handshake اولیه bridge بزنید:
+
+```bash
+tgproxy web-test
+```
+
+این دستور دو مسیر محلی و HTTPS عمومی را با **capability معتبر** (مشتق‌شده از Hostname و Secret) بررسی می‌کند و هیچ Secret یا URL احرازشده‌ای را چاپ نمی‌کند. اگر هر دو تست OK شوند، relay آماده است؛ **اتصال نهایی همچنان نیازمند نسخه‌ای از Telegram است که نوع WEB Proxy را پیاده‌سازی کرده باشد**. گزارش‌های بتای ۲۰۲۶ از پشتیبانی WEB در Android و Desktop حکایت دارند، اما سازگاری همه نسخه‌ها و سیستم‌عامل‌ها تضمین‌شده نیست. [مستندات رسمی پروتکل](https://github.com/telegramdesktop/tproxy-server/blob/master/PROTOCOL.md) و [کلاینت‌های آزمایشی](https://github.com/telegramdesktop/tproxy-server#6-configure-a-telegram-client).
 
 ### نصب بدون خرید دامنه
 
@@ -228,6 +238,10 @@ TGProxyForge/
 - Optional **promoted/sponsored channel** integration using `@MTProxyBot`
 - Persistent management menu for domain/IP, FakeTLS port, sponsor tag, proxy secret, health checks and updates
 - Automatic HTTPS fallback/masking when FakeTLS owns public port 443
+
+### Test actual WEB proxy bridge
+
+`HTTPS 200` and `readyz` alone do **not** prove the WEB relay is usable. Run `tgproxy web-test` after installation to verify the **authenticated** bridge over the local relay and public HTTPS endpoint. The test derives the capability in memory and does not print the secret or authenticated URL. A passing bridge test does not replace a real connection test using a Telegram build that supports the experimental WEB proxy transport. See the [upstream wire protocol](https://github.com/telegramdesktop/tproxy-server/blob/master/PROTOCOL.md).
 
 ### Install without buying a domain
 
