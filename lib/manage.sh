@@ -112,7 +112,7 @@ host = os.environ["DOMAIN"].lower()
 port = os.environ["RELAY_PORT"]
 secret = bytes.fromhex("dd" + os.environ["BASE_SECRET"])
 capability = base64.urlsafe_b64encode(
-    hmac.new(secret, ("tdesktop-web-proxy-bridge-v1\\n" + host).encode(), hashlib.sha256).digest()
+    hmac.new(secret, ("tdesktop-web-proxy-bridge-v1\n" + host).encode(), hashlib.sha256).digest()
 ).rstrip(b"=").decode()
 
 # Never print the capability, bridge URL, or secret. A normal HTTP 200 can
