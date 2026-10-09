@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.5 — 2026-10-09
+
+- Add `tgproxy web-test` to check authenticated WEB bridge over local HTTP relay and public HTTPS.
+- Health checks now distinguish the normal HTTP fallback page from a valid WEB capability response.
+- Never reveal the WEB bridge capability or proxy secret in diagnostic output.
+- Document Telegram client-version compatibility limitations for experimental WEB proxy connections.
+
+
 ## 0.1.4 — 2026-10-08
 
 - Add a no-owned-domain installation path: enter public IPv4, leave domain empty, and use an automatically generated `IP.sslip.io` hostname.
