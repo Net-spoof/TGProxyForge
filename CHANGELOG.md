@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.6 — 2026-10-31
+
+- Add `tgproxy monitor` and menu option 13 for live FakeTLS + WEB sessions, traffic rates, and service CPU/RAM.
+- Read Telemt authenticated connection counts and active IP totals from its existing localhost API.
+- Enable Telemt user traffic metrics on loopback-only TCP/19090; read WEB session and traffic counters from the relay's existing loopback metrics endpoint.
+- Use counter deltas for directional throughput; report unavailable data as N/A instead of showing guessed traffic or users.
+- Warn that `tgproxy apply` is needed once after upgrading and will restart active proxy services.
+- Add Python syntax/unit tests to CI.
+
+
 ## 0.1.5 — 2026-10-09
 
 - Add `tgproxy web-test` to check authenticated WEB bridge over local HTTP relay and public HTTPS.

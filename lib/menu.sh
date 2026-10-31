@@ -94,7 +94,13 @@ self_update() {
   ln -sfn "$SCRIPT_ROOT/tgproxy" /usr/local/bin/tgproxy
   ok "TGProxyForge updated from GitHub. Re-run: tgproxy"
 }
-uninstall_menu() {
+uninstall_monitor_dashboard() {
+  load_config
+  [[ -f "$SCRIPT_ROOT/lib/monitor.py" ]] || { warn "Monitor component is missing. Run tgproxy update."; return 1; }
+  python3 "$SCRIPT_ROOT/lib/monitor.py" --admin-port "$ADMIN_PORT" "$@"
+}
+
+menu() {
   warn "This stops Telemt, MTProxy, tproxy-server AND Caddy. Shared Caddy websites will go offline."
   warn "It removes the TGProxyForge manager and its systemd unit/override, but keeps upstream binaries and configs for recovery."
   warn "Backups under $BACKUP_DIR are kept."
@@ -129,6 +135,7 @@ menu() {
 10) Update TGProxyForge from GitHub
 11) Uninstall / disable stack (حذف نصب)
 12) Test WEB bridge authentication / HTTPS
+13) Live monitor (users / speed / CPU / RAM)
 0) Exit
 EOF_MENU
     hr
@@ -137,7 +144,7 @@ EOF_MENU
     case $c in
       1) show_status;; 2) show_links;; 3) edit_domain_ip;; 4) edit_port;; 5) edit_sponsor;;
       6) regenerate_secret;; 7) restart_all;; 8) health_check;; 9) apply_config; ok "Configuration re-applied.";;
-      10) self_update; return 0;; 11) uninstall_menu; return 0;; 12) web_bridge_test;; 0) return 0;; *) warn "Invalid choice.";;
+      10) self_update; return 0;; 11) uninstall_menu; return 0;; 12) web_bridge_test;; 13) monitor_dashboard;; 0) return 0;; *) warn "Invalid choice.";;
     esac
     echo; read -r -p "Press Enter to continue..." _ || true
     load_config
@@ -151,6 +158,8 @@ Usage:
   tgproxy              Open interactive management menu
   tgproxy install      Install both proxy stacks
   tgproxy status       Show status
+  tgproxy monitor      Live FakeTLS/WEB users, bandwidth, CPU, RAM (Ctrl+C to exit)
+  tgproxy monitor --once  Print a single 2-second sampled report
   tgproxy links        Show generated links
   tgproxy health       Run diagnostics, including authenticated WEB bridge
   tgproxy web-test     Verify actual WEB bridge over local HTTP and public HTTPS
@@ -164,6 +173,7 @@ main() {
   case ${1:-menu} in
     install) wizard;; menu) menu;; status) need_root; show_status;; links) need_root; show_links;;
     health) need_root; health_check;; web-test) need_root; web_bridge_test;; apply) need_root; apply_config;; update) need_root; self_update;;
+    monitor|stats) need_root; shift; monitor_dashboard "$@";;
     uninstall) need_root; uninstall_menu;;
     -h|--help|help) usage;; *) usage; exit 2;;
   esac

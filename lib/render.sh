@@ -89,6 +89,11 @@ EOF_UNIT
 
 render_telemt() {
   local mask_port=443 use_me=false ad_line=''
+  # Detect a conflicting listener before rewriting the Telemt configuration.
+  if ss -H -lntp 2>/dev/null | awk '$4 ~ /:19090$/ && $0 !~ /telemt/ {found=1} END {exit !found}'; then
+    warn "Monitoring port 127.0.0.1:19090 is already occupied by another service. No proxy settings changed."
+    return 1
+  fi
   [[ $FAKETLS_PORT -eq 443 ]] && mask_port=8443
   if [[ $SPONSOR_ENABLED == 1 ]]; then
     use_me=true
@@ -121,6 +126,9 @@ prefer = 4
 
 [server]
 port = $FAKETLS_PORT
+# Monitoring endpoint must never be exposed on a public interface.
+metrics_listen = "127.0.0.1:19090"
+metrics_whitelist = ["127.0.0.1/32", "::1/128"]
 
 [server.api]
 enabled = true
