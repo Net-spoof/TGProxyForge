@@ -14,3 +14,7 @@ jobs:
           bash -n install.sh
           bash -n tgproxy
           for f in lib/*.sh; do bash -n "$f"; done
+      - name: Python monitor syntax and unit tests
+        run: |
+          python3 -m py_compile lib/monitor.py
+          python3 -m unittest discover -s tests -v
