@@ -30,6 +30,8 @@ install_web_stack() {
   git -C "$SRC_DIR/tproxy-server" fetch -q --depth 1 origin "$TPROXY_COMMIT"
   git -C "$SRC_DIR/tproxy-server" checkout -q --detach FETCH_HEAD
   patch_tproxy_checkout_ports "$SRC_DIR/tproxy-server"
+  # Existing in-memory sessionsPerIP map -> anonymous count in localhost /metrics.
+  python3 "$SCRIPT_ROOT/lib/patch_tproxy_metrics.py" "$SRC_DIR/tproxy-server"
   write_site
 
   bash "$SRC_DIR/tproxy-server/deploy/install.sh" \
