@@ -20,5 +20,16 @@ jobs:
           test "$(grep -c '^menu() {' lib/menu.sh)" -eq 1
       - name: Python monitor syntax and unit tests
         run: |
-          python3 -m py_compile lib/monitor.py
+          python3 -m py_compile lib/monitor.py lib/patch_tproxy_metrics.py
           python3 -m unittest discover -s tests -v
+      - name: Compile/test pinned WEB relay with new metric
+        run: |
+          tmp="$(mktemp -d)"
+          git -C "$tmp" init -q
+          git -C "$tmp" remote add origin https://github.com/telegramdesktop/tproxy-server.git
+          git -C "$tmp" fetch -q --depth 1 origin c8adb8b7c6b7fc46c12ae3acb68be9070c26a8e8
+          git -C "$tmp" checkout -q --detach FETCH_HEAD
+          python3 lib/patch_tproxy_metrics.py "$tmp"
+          (cd "$tmp" && go test ./internal/session ./internal/server && go build ./cmd/tproxy-server)
+          python3 lib/patch_tproxy_metrics.py "$tmp"
+
