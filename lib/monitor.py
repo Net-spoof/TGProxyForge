@@ -61,6 +61,9 @@ def get_telemt_connections():
         for item in rows:
             for ip in item.get("active_unique_ips_list", []):
                 ips.add(str(ip))
+        # Do not report '0 online clients' when API telemetry is incomplete.
+        if current > 0 and not ips:
+            return current, None
         return current, len(ips)
     except (OSError, ValueError, TypeError, KeyError, urllib.error.URLError):
         return None, None
@@ -154,6 +157,11 @@ def int_text(value):
     return str(int(value)) if value is not None else "N/A"
 
 
+def estimated_online_clients(reading):
+    """IP-based FakeTLS and session-based WEB estimates, never exact people."""
+    return reading.get("ips"), reading.get("web", {}).get("tproxy_sessions_live")
+
+
 def render(before, after, admin_port):
     seconds = after["time"] - before["time"]
     fake = after["telemt"]
@@ -179,10 +187,13 @@ def render(before, after, admin_port):
         size_text(web_down, True), size_text(web_up, True),
     ))
     print("-" * 76)
-    if after["ips"] is not None:
-        print("FakeTLS unique active IPs : %d (not necessarily distinct people)" % after["ips"])
+    fake_est, web_est = estimated_online_clients(after)
+    print("ESTIMATED ONLINE CLIENTS (not Telegram user accounts)")
+    print("  FakeTLS : %s (distinct active IPs)" % int_text(fake_est))
+    print("  WEB     : <= %s (based on live sessions; may be fewer people)" %
+          int_text(web_est) if web_est is not None else "  WEB     : N/A")
     if "tproxy_streams_live" in web:
-        print("WEB active streams       : %d (not distinct users)" % web["tproxy_streams_live"])
+        print("  WEB active streams: %d (separate from sessions)" % web["tproxy_streams_live"])
     total_down = fake_down + web_down if fake_down is not None and web_down is not None else None
     total_up = fake_up + web_up if fake_up is not None and web_up is not None else None
     print("Combined proxy throughput: down %s | up %s" %
@@ -206,6 +217,8 @@ def render(before, after, admin_port):
         print("      to enable loopback-only metrics (restarts proxy services).")
     if not web or "tproxy_bytes_up_total" not in web or "tproxy_bytes_down_total" not in web:
         print("NOTE: WEB metrics unavailable on 127.0.0.1:%d; check tproxy-server." % admin_port)
+    print("IP counts and WEB sessions cannot identify exact people.")
+    print("The two estimates must not be added as a unique-user total.")
     print("Throughput is payload bytes/sec, not physical network throughput.")
     print("CPU is per main process and can exceed 100%% on multicore systems.")
     print("Ctrl+C to return to the manager.")
