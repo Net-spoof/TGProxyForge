@@ -113,6 +113,7 @@ def snapshot(admin_port):
     ))
     web = get_metrics("http://127.0.0.1:%d/metrics" % admin_port, (
         "tproxy_sessions_live", "tproxy_streams_live",
+        "tproxy_unique_client_ips_live",
         "tproxy_bytes_up_total", "tproxy_bytes_down_total",
     ))
     return {
@@ -154,6 +155,11 @@ def int_text(value):
     return str(int(value)) if value is not None else "N/A"
 
 
+def online_estimates(reading):
+    """Unique source-IP counts per protocol; NOT Telegram account counts."""
+    return reading.get("ips"), reading.get("web", {}).get("tproxy_unique_client_ips_live")
+
+
 def render(before, after, admin_port):
     seconds = after["time"] - before["time"]
     fake = after["telemt"]
@@ -179,10 +185,15 @@ def render(before, after, admin_port):
         size_text(web_down, True), size_text(web_up, True),
     ))
     print("-" * 76)
-    if after["ips"] is not None:
-        print("FakeTLS unique active IPs : %d (not necessarily distinct people)" % after["ips"])
+    fake_clients, web_clients = online_estimates(after)
+    print("ESTIMATED ONLINE CLIENTS (active unique source IPs)")
+    print("  FakeTLS   : %s IPs" % int_text(fake_clients))
+    print("  WEB Proxy : %s IPs" % int_text(web_clients))
+    if fake_clients is not None and web_clients is not None:
+        print("  Per-proxy sum: %d (IPs may overlap across proxies)" %
+              (fake_clients + web_clients))
     if "tproxy_streams_live" in web:
-        print("WEB active streams       : %d (not distinct users)" % web["tproxy_streams_live"])
+        print("WEB active streams: %d (not distinct users)" % web["tproxy_streams_live"])
     total_down = fake_down + web_down if fake_down is not None and web_down is not None else None
     total_up = fake_up + web_up if fake_up is not None and web_up is not None else None
     print("Combined proxy throughput: down %s | up %s" %
@@ -206,6 +217,10 @@ def render(before, after, admin_port):
         print("      to enable loopback-only metrics (restarts proxy services).")
     if not web or "tproxy_bytes_up_total" not in web or "tproxy_bytes_down_total" not in web:
         print("NOTE: WEB metrics unavailable on 127.0.0.1:%d; check tproxy-server." % admin_port)
+    elif web_clients is None:
+        print("NOTE: WEB unique IP telemetry is not enabled on this installation.")
+        print("      Run 'tgproxy web-ips-enable' (rebuilds/restarts WEB relay only).")
+    print("Unique IPs are a proxy for online clients, NOT exact Telegram users.")
     print("Throughput is payload bytes/sec, not physical network throughput.")
     print("CPU is per main process and can exceed 100%% on multicore systems.")
     print("Ctrl+C to return to the manager.")
