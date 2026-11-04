@@ -9,7 +9,7 @@ umask 077
 SCRIPT_PATH="$(readlink -f -- "${BASH_SOURCE[0]}")"
 SCRIPT_ROOT="$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd -P)"
 
-for module in common render manage wizard menu; do
+for module in common render manage wizard webip menu; do
   file="$SCRIPT_ROOT/lib/${module}.sh"
   [[ -r $file ]] || { echo "TGProxyForge: missing module: $file" >&2; exit 1; }
   # shellcheck source=/dev/null
