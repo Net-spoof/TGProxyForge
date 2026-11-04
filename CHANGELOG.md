@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.8 — 2026-11-04
+
+- Display estimated online clients separately for FakeTLS and WEB using distinct active source-IP counts, not raw connections or sessions.
+- Patch the pinned WEB tproxy-server source at fresh installation to expose an anonymous `tproxy_unique_client_ips_live` count from its existing `sessionsPerIP` map.
+- Add opt-in `tgproxy web-ips-enable` for existing installations. Validate and build before restarting only the WEB relay, with binary rollback if readiness fails.
+- No public management endpoints or IP address lists. WEB count is N/A on older binaries until opted in.
+- Add parser, patch, CLI, and upstream Go compile tests.
+
+
 ## 0.1.7 — 2026-11-04
 
 - Fix missing `monitor_dashboard` entrypoint so menu option 13 and `tgproxy monitor` work.
