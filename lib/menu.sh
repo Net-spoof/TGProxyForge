@@ -136,6 +136,7 @@ menu() {
 11) Uninstall / disable stack (حذف نصب)
 12) Test WEB bridge authentication / HTTPS
 13) Live monitor (users / speed / CPU / RAM)
+14) Enable WEB unique-IP monitoring (one-time rebuild)
 0) Exit
 EOF_MENU
     hr
@@ -144,7 +145,7 @@ EOF_MENU
     case $c in
       1) show_status;; 2) show_links;; 3) edit_domain_ip;; 4) edit_port;; 5) edit_sponsor;;
       6) regenerate_secret;; 7) restart_all;; 8) health_check;; 9) apply_config; ok "Configuration re-applied.";;
-      10) self_update; return 0;; 11) uninstall_menu; return 0;; 12) web_bridge_test;; 13) monitor_dashboard;; 0) return 0;; *) warn "Invalid choice.";;
+      10) self_update; return 0;; 11) uninstall_menu; return 0;; 12) web_bridge_test;; 13) monitor_dashboard;; 14) enable_web_ip_metrics;; 0) return 0;; *) warn "Invalid choice.";;
     esac
     echo; read -r -p "Press Enter to continue..." _ || true
     load_config
@@ -160,6 +161,7 @@ Usage:
   tgproxy status       Show status
   tgproxy monitor      Live FakeTLS/WEB users, bandwidth, CPU, RAM (Ctrl+C to exit)
   tgproxy monitor --once  Print a single 2-second sampled report
+  tgproxy web-ips-enable  One-time build/restart of WEB relay for unique-IP counts
   tgproxy links        Show generated links
   tgproxy health       Run diagnostics, including authenticated WEB bridge
   tgproxy web-test     Verify actual WEB bridge over local HTTP and public HTTPS
@@ -174,6 +176,7 @@ main() {
     install) wizard;; menu) menu;; status) need_root; show_status;; links) need_root; show_links;;
     health) need_root; health_check;; web-test) need_root; web_bridge_test;; apply) need_root; apply_config;; update) need_root; self_update;;
     monitor|stats) need_root; shift; monitor_dashboard "$@";;
+    web-ips-enable) need_root; enable_web_ip_metrics;;
     uninstall) need_root; uninstall_menu;;
     -h|--help|help) usage;; *) usage; exit 2;;
   esac
