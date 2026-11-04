@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.7 — 2026-11-04
+
+- Fix missing `monitor_dashboard` entrypoint so menu option 13 and `tgproxy monitor` work.
+- Restore `uninstall_menu` that was accidentally renamed by the previous patch.
+- Add CI assertions for the interactive menu, monitoring, and uninstall function names.
+
+
 ## 0.1.6 — 2026-10-31
 
 - Add `tgproxy monitor` and menu option 13 for live FakeTLS + WEB sessions, traffic rates, and service CPU/RAM.
