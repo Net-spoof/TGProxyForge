@@ -94,13 +94,13 @@ self_update() {
   ln -sfn "$SCRIPT_ROOT/tgproxy" /usr/local/bin/tgproxy
   ok "TGProxyForge updated from GitHub. Re-run: tgproxy"
 }
-uninstall_monitor_dashboard() {
+monitor_dashboard() {
   load_config
   [[ -f "$SCRIPT_ROOT/lib/monitor.py" ]] || { warn "Monitor component is missing. Run tgproxy update."; return 1; }
   python3 "$SCRIPT_ROOT/lib/monitor.py" --admin-port "$ADMIN_PORT" "$@"
 }
 
-menu() {
+uninstall_menu() {
   warn "This stops Telemt, MTProxy, tproxy-server AND Caddy. Shared Caddy websites will go offline."
   warn "It removes the TGProxyForge manager and its systemd unit/override, but keeps upstream binaries and configs for recovery."
   warn "Backups under $BACKUP_DIR are kept."
