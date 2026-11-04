@@ -3,7 +3,7 @@
   <h1>TGProxyForge</h1>
   <p><strong>Telegram MTProto FakeTLS &amp; WEB Proxy</strong><br>Automated deployment • Unified management • Sponsor integration</p>
   <p>
-    <img alt="Version" src="https://img.shields.io/badge/version-0.1.6-0284c7">
+    <img alt="Version" src="https://img.shields.io/badge/version-0.1.7-0284c7">
     <img alt="Platform" src="https://img.shields.io/badge/Linux-Ubuntu%20%7C%20Debian-334155">
     <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e">
   </p>

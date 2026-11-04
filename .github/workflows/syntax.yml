@@ -14,6 +14,10 @@ jobs:
           bash -n install.sh
           bash -n tgproxy
           for f in lib/*.sh; do bash -n "$f"; done
+      - name: Assert management commands are defined
+        run: |
+          bash -c 'source lib/menu.sh; declare -F monitor_dashboard; declare -F uninstall_menu; declare -F menu; declare -F main'
+          test "$(grep -c '^menu() {' lib/menu.sh)" -eq 1
       - name: Python monitor syntax and unit tests
         run: |
           python3 -m py_compile lib/monitor.py
