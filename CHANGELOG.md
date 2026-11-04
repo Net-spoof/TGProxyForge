@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.8 — 2026-11-04
+
+- Show estimated online clients in the terminal dashboard: FakeTLS uses live unique source IPs; WEB uses active sessions as an explicitly labeled rough upper bound.
+- Keep per-protocol counts separate, and never equate TCP connections or summed metrics with exact people or Telegram accounts.
+- Detect missing FakeTLS active IP telemetry instead of silently displaying zero when there are live connections.
+- Avoid risky changes to the shared FakeTLS/Caddy WEB transport and avoid rebuilding or restarting production proxies.
+
+
 ## 0.1.7 — 2026-11-04
 
 - Fix missing `monitor_dashboard` entrypoint so menu option 13 and `tgproxy monitor` work.
