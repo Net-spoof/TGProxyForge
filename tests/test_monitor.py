@@ -24,6 +24,22 @@ class MonitorTests(unittest.TestCase):
         self.assertEqual(parsed["telemt_user_octets_to_client_total"], 3072)
         self.assertEqual(parsed["telemt_user_octets_from_client_total"], 300)
 
+    def test_online_estimates_are_labeled_and_not_added(self):
+        fake, web = monitor.estimated_online_clients({
+            "connections": 674, "ips": 197,
+            "web": {"tproxy_sessions_live": 29, "tproxy_streams_live": 54},
+        })
+        self.assertEqual((fake, web), (197, 29))
+        self.assertEqual(monitor.estimated_online_clients({
+            "ips": None, "web": {},
+        }), (None, None))
+
+    def test_telemt_missing_active_ip_data_is_unknown(self):
+        from unittest.mock import patch
+        payload = '{"ok":true,"data":[{"current_connections":2,"active_unique_ips_list":[]}]}'
+        with patch.object(monitor, "read_url", return_value=payload):
+            self.assertEqual(monitor.get_telemt_connections(), (2, None))
+
     def test_web_metrics(self):
         parsed = monitor.parse_metrics(
             "tproxy_sessions_live 7\n"

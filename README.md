@@ -3,7 +3,7 @@
   <h1>TGProxyForge</h1>
   <p><strong>Telegram MTProto FakeTLS &amp; WEB Proxy</strong><br>Automated deployment • Unified management • Sponsor integration</p>
   <p>
-    <img alt="Version" src="https://img.shields.io/badge/version-0.1.7-0284c7">
+    <img alt="Version" src="https://img.shields.io/badge/version-0.1.8-0284c7">
     <img alt="Platform" src="https://img.shields.io/badge/Linux-Ubuntu%20%7C%20Debian-334155">
     <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e">
   </p>
@@ -29,7 +29,7 @@
   <li>مدیریت دامنه و IP، پورت FakeTLS، Secret و سرویس‌ها از منوی تعاملی</li>
   <li>پشتیبانی از کانال اسپانسری با Proxy Tag صادرشده از <a href="https://t.me/MTProxyBot">@MTProxyBot</a></li>
   <li>نمایش لینک‌ها، بررسی سلامت سرویس‌ها، تست معتبر WEB Bridge، به‌روزرسانی و غیرفعال‌سازی سرویس‌ها</li>
-  <li>مانیتور زندهٔ FakeTLS و WEB: تعداد اتصال‌ها/نشست‌های فعال، سرعت دانلود و آپلود، CPU و RAM سرویس‌ها</li>
+  <li>مانیتور زندهٔ FakeTLS و WEB: اتصال‌ها/نشست‌ها، سرعت دانلود و آپلود، CPU و RAM، و تخمین کلاینت‌های آنلاین</li>
 </ul>
 
 <h3>🚀 نصب سریع</h3>
@@ -68,7 +68,7 @@
 <h3>📊 مانیتور زنده پروکسی‌ها</h3>
 <p>از منوی مدیریت گزینهٔ <strong>13</strong> را انتخاب کنید یا دستور <code>tgproxy monitor</code> را اجرا کنید. هر ۲ ثانیه داده‌ها تازه می‌شوند. برای فعال‌کردن اولین‌بارهٔ خروجی آمار Telemt بعد از آپدیت، <code>tgproxy apply</code> را اجرا کنید؛ <strong>این فرمان سرویس‌ها را مجدداً راه‌اندازی می‌کند و اتصال‌های جاری موقتاً قطع می‌شوند.</strong></p>
 <p>آمار Telemt از API محلی و شمارنده‌های مخصوص کاربران، آمار WEB از endpoint داخلی <code>tproxy-server</code> و CPU/RAM از وضعیت پردازش‌ها در لینوکس خوانده می‌شود. شمارنده‌ها فقط روی <code>127.0.0.1</code> قابل دسترسی‌اند. سرعت‌ها بر اساس اختلاف بایت‌ها بین دو نمونه محاسبه می‌شوند و شامل overhead شبکه نیستند.</p>
-<p><strong>توجه:</strong> «Connections» اتصال‌های احرازشده و «WEB sessions» نشست‌های وب را نشان می‌دهد، نه تعداد قطعی افراد یکتا. IPهای یکتای فعال برای FakeTLS نیز جداگانه نمایش داده می‌شوند؛ هر IP لزوماً یک نفر نیست. CPU و RAM مربوط به پردازش اصلی هر سرویس هستند.</p>
+<p><strong>تخمین کاربران آنلاین:</strong> مانیتور برای FakeTLS تعداد IPهای یکتای فعال و برای WEB حداکثر تعداد نمونه‌های کلاینت بر اساس نشست‌های فعال را جداگانه نمایش می‌دهد. یک IP ممکن است به چند نفر تعلق داشته باشد؛ یک کاربر نیز می‌تواند چند IP یا چند نشست داشته باشد. شمارش IP یکتای واقعی در WEB با مسیر ماسکینگ فعلی (Telemt → Caddy) قابل اتکا نیست، چون IP اصلی ممکن است از بین برود. بنابراین شمارش نشست WEB به‌صراحت «تخمینی» است و با تعداد IPهای FakeTLS جمع نمی‌شود. نمایش این آمارها نیازمند بازسازی سرویس‌ها یا تغییر پروکسی نیست.</p>
 
 <h3>🏗️ معماری</h3>
 <p>در حالت پیش‌فرض، Telemt روی پورت ۴۴۳ عمومی قرار دارد. ترافیک FakeTLS را مدیریت کرده و درخواست‌های HTTPS معمولی را به Caddy روی <code>127.0.0.1:8443</code> هدایت می‌کند. Caddy درخواست‌ها را به WEB relay داخلی می‌رساند و MTProxy رسمی backend آن است.</p>
@@ -118,7 +118,7 @@
 - Optional promoted-channel integration through [@MTProxyBot](https://t.me/MTProxyBot).
 - Interactive management of public IP, hostname, FakeTLS port, secrets, proxy links and service lifecycle.
 - Diagnostics for TLS, Telemt, WEB Bridge authentication and Middle Proxy routing.
-- Read-only live terminal monitor: active FakeTLS connections, WEB sessions/streams, upload/download throughput and process CPU/RAM.
+- Read-only live terminal monitor: active FakeTLS connections, WEB sessions/streams, upload/download throughput, process CPU/RAM and explicitly qualified online-client estimates.
 
 ### Quick installation
 
@@ -157,7 +157,7 @@ tgproxy
 
 After updating from an earlier release, run `tgproxy apply` once to enable Telemt's loopback-only Prometheus metrics on `127.0.0.1:19090`. **Applying the configuration restarts the proxy services**, interrupting active sessions. The WEB relay already exposes local metrics through its private admin port.
 
-`tgproxy monitor` presents the native Telemt API current connections and unique active source IPs, WEB relay sessions and streams, actual client-direction throughput from each proxy's byte counters, and process CPU/RSS memory. A connection/session/IP does not necessarily equal one human user. Rates are payload rather than wire-level bytes. No monitoring API should be made publicly reachable.
+`tgproxy monitor` presents the native Telemt API current connections and unique active source IPs, WEB relay sessions and streams, actual client-direction throughput from each proxy's byte counters, and process CPU/RSS memory. The online-client indicator estimates FakeTLS via distinct active source IPs and WEB via live sessions (an upper bound on distinct session-owning clients). The current Telemt masking to Caddy may hide original WEB source IPs, so the dashboard never claims reliable WEB unique-IP counts. Neither estimate represents exact Telegram accounts or people, and the two figures are not deduplicated or added together. No rebuild or restart is needed for this dashboard upgrade. Rates are payload rather than wire-level bytes. No monitoring API should be made publicly reachable.
 
 ### Network and sponsor
 
