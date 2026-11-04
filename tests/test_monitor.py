@@ -24,15 +24,32 @@ class MonitorTests(unittest.TestCase):
         self.assertEqual(parsed["telemt_user_octets_to_client_total"], 3072)
         self.assertEqual(parsed["telemt_user_octets_from_client_total"], 300)
 
+    def test_unique_clients_are_ip_counts_not_connections(self):
+        fake, web = monitor.online_estimates({
+            "ips": 197,
+            "connections": 674,
+            "web": {
+                "tproxy_sessions_live": 29,
+                "tproxy_unique_client_ips_live": 21,
+            },
+        })
+        self.assertEqual((fake, web), (197, 21))
+        self.assertEqual(monitor.online_estimates({
+            "ips": 197, "web": {"tproxy_sessions_live": 29},
+        }), (197, None))
+
     def test_web_metrics(self):
         parsed = monitor.parse_metrics(
             "tproxy_sessions_live 7\n"
+            "tproxy_unique_client_ips_live 4\n"
             "tproxy_streams_live 11\n"
             "tproxy_bytes_down_total 8192\n"
             "tproxy_bytes_up_total 4096\n",
             {"tproxy_sessions_live", "tproxy_streams_live",
+             "tproxy_unique_client_ips_live",
              "tproxy_bytes_down_total", "tproxy_bytes_up_total"})
         self.assertEqual(parsed["tproxy_sessions_live"], 7)
+        self.assertEqual(parsed["tproxy_unique_client_ips_live"], 4)
         self.assertEqual(parsed["tproxy_bytes_down_total"], 8192)
 
     def test_rate_resets_and_missing_are_unknown(self):
