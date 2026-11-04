@@ -3,7 +3,7 @@
   <h1>TGProxyForge</h1>
   <p><strong>Telegram MTProto FakeTLS &amp; WEB Proxy</strong><br>Automated deployment • Unified management • Sponsor integration</p>
   <p>
-    <img alt="Version" src="https://img.shields.io/badge/version-0.1.7-0284c7">
+    <img alt="Version" src="https://img.shields.io/badge/version-0.1.8-0284c7">
     <img alt="Platform" src="https://img.shields.io/badge/Linux-Ubuntu%20%7C%20Debian-334155">
     <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e">
   </p>
@@ -29,7 +29,7 @@
   <li>مدیریت دامنه و IP، پورت FakeTLS، Secret و سرویس‌ها از منوی تعاملی</li>
   <li>پشتیبانی از کانال اسپانسری با Proxy Tag صادرشده از <a href="https://t.me/MTProxyBot">@MTProxyBot</a></li>
   <li>نمایش لینک‌ها، بررسی سلامت سرویس‌ها، تست معتبر WEB Bridge، به‌روزرسانی و غیرفعال‌سازی سرویس‌ها</li>
-  <li>مانیتور زندهٔ FakeTLS و WEB: تعداد اتصال‌ها/نشست‌های فعال، سرعت دانلود و آپلود، CPU و RAM سرویس‌ها</li>
+  <li>مانیتور زندهٔ FakeTLS و WEB: اتصال‌ها، نشست‌ها، سرعت ترافیک، CPU و RAM و تخمین کلاینت‌های آنلاین با شمارش IPهای یکتای فعال</li>
 </ul>
 
 <h3>🚀 نصب سریع</h3>
@@ -53,6 +53,7 @@
 <tr><td><code>tgproxy status</code></td><td>وضعیت سرویس‌ها و پورت‌های فعال</td></tr>
 <tr><td><code>tgproxy monitor</code></td><td>مانیتور لحظه‌ای اتصال‌ها، سرعت آپلود/دانلود، CPU و RAM؛ خروج با Ctrl+C</td></tr>
 <tr><td><code>tgproxy monitor --once</code></td><td>یک گزارش دو نمونه‌ای بدون تازه‌سازی پیوسته</td></tr>
+<tr><td><code>tgproxy web-ips-enable</code></td><td>فعال‌سازی یک‌باره شمارنده IP یکتای WEB روی نصب‌های قبلی؛ بازسازی و ری‌استارت WEB</td></tr>
 <tr><td><code>tgproxy links</code></td><td>دریافت لینک FakeTLS و WEB Proxy</td></tr>
 <tr><td><code>tgproxy health</code></td><td>بررسی سرویس‌ها، HTTPS، WEB Bridge و مسیر اسپانسر</td></tr>
 <tr><td><code>tgproxy web-test</code></td><td>تست احراز هویت WEB Bridge از مسیر داخلی و HTTPS عمومی سرور</td></tr>
@@ -68,7 +69,8 @@
 <h3>📊 مانیتور زنده پروکسی‌ها</h3>
 <p>از منوی مدیریت گزینهٔ <strong>13</strong> را انتخاب کنید یا دستور <code>tgproxy monitor</code> را اجرا کنید. هر ۲ ثانیه داده‌ها تازه می‌شوند. برای فعال‌کردن اولین‌بارهٔ خروجی آمار Telemt بعد از آپدیت، <code>tgproxy apply</code> را اجرا کنید؛ <strong>این فرمان سرویس‌ها را مجدداً راه‌اندازی می‌کند و اتصال‌های جاری موقتاً قطع می‌شوند.</strong></p>
 <p>آمار Telemt از API محلی و شمارنده‌های مخصوص کاربران، آمار WEB از endpoint داخلی <code>tproxy-server</code> و CPU/RAM از وضعیت پردازش‌ها در لینوکس خوانده می‌شود. شمارنده‌ها فقط روی <code>127.0.0.1</code> قابل دسترسی‌اند. سرعت‌ها بر اساس اختلاف بایت‌ها بین دو نمونه محاسبه می‌شوند و شامل overhead شبکه نیستند.</p>
-<p><strong>توجه:</strong> «Connections» اتصال‌های احرازشده و «WEB sessions» نشست‌های وب را نشان می‌دهد، نه تعداد قطعی افراد یکتا. IPهای یکتای فعال برای FakeTLS نیز جداگانه نمایش داده می‌شوند؛ هر IP لزوماً یک نفر نیست. CPU و RAM مربوط به پردازش اصلی هر سرویس هستند.</p>
+<p><strong>تخمین کاربران آنلاین:</strong> «Connections» اتصال‌ها و «WEB sessions» نشست‌ها هستند، نه تعداد افراد. «Estimated online clients» تعداد IPهای یکتای دارای اتصال یا نشست فعال را <strong>جداگانه برای FakeTLS و WEB</strong> نشان می‌دهد. یک IP ممکن است متعلق به چند نفر باشد؛ یک نفر نیز ممکن است چند IP داشته باشد. جمع دو سرویس ممکن است IPهای تکراری داشته باشد. هیچ‌یک معادل تعداد دقیق حساب‌های تلگرام نیست.</p>
+<p>در نصب تازه شمارندهٔ IP یکتای WEB به‌صورت خودکار در باینری ساخته می‌شود. در نصب موجود، پس از <code>tgproxy update</code> یک‌بار <code>tgproxy web-ips-enable</code> را اجرا کنید. این فرمان با تأیید شما، WEB relay را آزمایش و بازسازی می‌کند و <strong>فقط سرویس WEB</strong> را ری‌استارت می‌کند؛ در صورت آماده‌نشدن نسخه جدید، نسخه قبلی را برمی‌گرداند. سرویس FakeTLS دست‌نخورده می‌ماند.</p>
 
 <h3>🏗️ معماری</h3>
 <p>در حالت پیش‌فرض، Telemt روی پورت ۴۴۳ عمومی قرار دارد. ترافیک FakeTLS را مدیریت کرده و درخواست‌های HTTPS معمولی را به Caddy روی <code>127.0.0.1:8443</code> هدایت می‌کند. Caddy درخواست‌ها را به WEB relay داخلی می‌رساند و MTProxy رسمی backend آن است.</p>
@@ -144,6 +146,7 @@ tgproxy
 | `tgproxy status` | Inspect service state and listeners |
 | `tgproxy monitor` | Live 2-second proxy activity and per-service CPU/RAM (Ctrl+C to exit) |
 | `tgproxy monitor --once` | Print one sampled report and exit |
+| `tgproxy web-ips-enable` | Enable anonymous unique-WEB-IP counts on older installations with an opt-in relay rebuild/restart |
 | `tgproxy links` | Print FakeTLS and WEB Proxy links |
 | `tgproxy health` | Check service health, WEB Bridge and sponsor routing |
 | `tgproxy web-test` | Verify authenticated WEB Bridge on local relay and public HTTPS |
@@ -157,7 +160,7 @@ tgproxy
 
 After updating from an earlier release, run `tgproxy apply` once to enable Telemt's loopback-only Prometheus metrics on `127.0.0.1:19090`. **Applying the configuration restarts the proxy services**, interrupting active sessions. The WEB relay already exposes local metrics through its private admin port.
 
-`tgproxy monitor` presents the native Telemt API current connections and unique active source IPs, WEB relay sessions and streams, actual client-direction throughput from each proxy's byte counters, and process CPU/RSS memory. A connection/session/IP does not necessarily equal one human user. Rates are payload rather than wire-level bytes. No monitoring API should be made publicly reachable.
+`tgproxy monitor` presents the native Telemt API current connections and unique active source IPs, WEB relay sessions and streams, actual client-direction throughput from each proxy's byte counters, and process CPU/RSS memory. Estimated online client counts use distinct active source IPs, separately for FakeTLS and WEB. These counts are not exact Telegram accounts: NAT can merge people, a user can have multiple addresses, and addresses may overlap between proxy services. Fresh installs build the WEB count metric. On an older installation, run `tgproxy web-ips-enable` once to test/rebuild the pinned WEB relay and restart only that service. Until enabled, the WEB estimate shows N/A instead of equating sessions with people. No IP address list or personal identifier is exported. Rates are payload rather than wire-level bytes. No monitoring API should be made publicly reachable.
 
 ### Network and sponsor
 
